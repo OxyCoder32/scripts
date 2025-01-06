@@ -1,9 +1,6 @@
--- Dependencias necesarias
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
--- Crear GUI principal
 local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local Title = Instance.new("TextLabel")
@@ -23,7 +20,6 @@ local MaximizeButton = Instance.new("TextButton")
 ScreenGui.Name = "CustomGUI"
 ScreenGui.Parent = game:GetService("CoreGui")
 
--- GUI principal
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
@@ -33,7 +29,6 @@ MainFrame.Position = UDim2.new(0.5, -110, 0.5, -200)
 MainFrame.Active = true
 MainFrame.Draggable = true
 
--- Título
 Title.Name = "Title"
 Title.Parent = MainFrame
 Title.BackgroundColor3 = Color3.new(0.2, 0.2, 0.5)
@@ -55,7 +50,6 @@ MinimizeButton.Text = "▼"
 MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
 MinimizeButton.TextSize = 14
 
--- Dropdown jugadores
 PlayerDropdown.Name = "PlayerDropdown"
 PlayerDropdown.Parent = MainFrame
 PlayerDropdown.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
@@ -116,7 +110,6 @@ CloseButton.Size = UDim2.new(0, 200, 0, 30)
 CloseButton.Text = "Close GUI"
 CloseButton.TextColor3 = Color3.new(1, 1, 1)
 
--- Marco minimizado
 MinimizedFrame.Name = "MinimizedFrame"
 MinimizedFrame.Parent = ScreenGui
 MinimizedFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
@@ -146,7 +139,6 @@ MaximizeButton.Text = "+"
 MaximizeButton.TextColor3 = Color3.new(1, 1, 1)
 MaximizeButton.TextSize = 14
 
--- Funciones
 MinimizeButton.MouseButton1Click:Connect(function()
     MinimizedFrame.Position = MainFrame.Position
     MainFrame.Visible = false
@@ -163,7 +155,6 @@ CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Función para refrescar jugadores
 local function refreshPlayers()
     for _, child in ipairs(DropdownFrame:GetChildren()) do
         if child:IsA("TextButton") then
@@ -211,5 +202,4 @@ SendButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Inicialización
 refreshPlayers()
