@@ -39,7 +39,6 @@ Title.Text = "Give Money"
 Title.TextColor3 = Color3.new(1, 1, 1)
 Title.TextSize = 18
 
--- Botón minimizar
 MinimizeButton.Name = "MinimizeButton"
 MinimizeButton.Parent = Title
 MinimizeButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
