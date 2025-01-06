@@ -1,0 +1,215 @@
+-- Dependencias necesarias
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Crear GUI principal
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local MinimizeButton = Instance.new("TextButton")
+local PlayerDropdown = Instance.new("TextButton")
+local DropdownFrame = Instance.new("ScrollingFrame")
+local RefreshButton = Instance.new("TextButton")
+local ChairInput = Instance.new("TextBox")
+local MoneyInput = Instance.new("TextBox")
+local SendButton = Instance.new("TextButton")
+local CloseButton = Instance.new("TextButton")
+local UIListLayout = Instance.new("UIListLayout")
+local MinimizedFrame = Instance.new("Frame")
+local MinimizedTitle = Instance.new("TextLabel")
+local MaximizeButton = Instance.new("TextButton")
+
+ScreenGui.Name = "CustomGUI"
+ScreenGui.Parent = game:GetService("CoreGui")
+
+-- GUI principal
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+MainFrame.BorderColor3 = Color3.new(1, 1, 1)
+MainFrame.Size = UDim2.new(0, 220, 0, 400)
+MainFrame.Position = UDim2.new(0.5, -110, 0.5, -200)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+-- Título
+Title.Name = "Title"
+Title.Parent = MainFrame
+Title.BackgroundColor3 = Color3.new(0.2, 0.2, 0.5)
+Title.BorderSizePixel = 0
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "Give Money"
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.TextSize = 18
+
+-- Botón minimizar
+MinimizeButton.Name = "MinimizeButton"
+MinimizeButton.Parent = Title
+MinimizeButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+MinimizeButton.BorderSizePixel = 0
+MinimizeButton.Size = UDim2.new(0, 20, 0, 20)
+MinimizeButton.Position = UDim2.new(1, -30, 0.5, -10)
+MinimizeButton.Text = "▼"
+MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
+MinimizeButton.TextSize = 14
+
+-- Dropdown jugadores
+PlayerDropdown.Name = "PlayerDropdown"
+PlayerDropdown.Parent = MainFrame
+PlayerDropdown.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+PlayerDropdown.Position = UDim2.new(0, 10, 0, 50)
+PlayerDropdown.Size = UDim2.new(0, 200, 0, 30)
+PlayerDropdown.Text = "Select Player"
+PlayerDropdown.TextColor3 = Color3.new(1, 1, 1)
+
+DropdownFrame.Name = "DropdownFrame"
+DropdownFrame.Parent = MainFrame
+DropdownFrame.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+DropdownFrame.Position = UDim2.new(0, 10, 0, 90)
+DropdownFrame.Size = UDim2.new(0, 200, 0, 100)
+DropdownFrame.Visible = false
+DropdownFrame.CanvasSize = UDim2.new(0, 0, 1, 0)
+DropdownFrame.ScrollBarThickness = 8
+
+UIListLayout.Parent = DropdownFrame
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+RefreshButton.Name = "RefreshButton"
+RefreshButton.Parent = MainFrame
+RefreshButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+RefreshButton.Position = UDim2.new(0, 10, 0, 200)
+RefreshButton.Size = UDim2.new(0, 200, 0, 30)
+RefreshButton.Text = "Refresh Players"
+RefreshButton.TextColor3 = Color3.new(1, 1, 1)
+
+ChairInput.Name = "ChairInput"
+ChairInput.Parent = MainFrame
+ChairInput.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+ChairInput.Position = UDim2.new(0, 10, 0, 240)
+ChairInput.Size = UDim2.new(0, 200, 0, 30)
+ChairInput.PlaceholderText = "Enter Chair ID"
+ChairInput.Text = ""
+
+MoneyInput.Name = "MoneyInput"
+MoneyInput.Parent = MainFrame
+MoneyInput.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+MoneyInput.Position = UDim2.new(0, 10, 0, 280)
+MoneyInput.Size = UDim2.new(0, 200, 0, 30)
+MoneyInput.PlaceholderText = "Enter Money Amount"
+MoneyInput.Text = ""
+
+SendButton.Name = "SendButton"
+SendButton.Parent = MainFrame
+SendButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+SendButton.Position = UDim2.new(0, 10, 0, 320)
+SendButton.Size = UDim2.new(0, 200, 0, 30)
+SendButton.Text = "Send Event"
+SendButton.TextColor3 = Color3.new(1, 1, 1)
+
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = MainFrame
+CloseButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+CloseButton.Position = UDim2.new(0, 10, 0, 360)
+CloseButton.Size = UDim2.new(0, 200, 0, 30)
+CloseButton.Text = "Close GUI"
+CloseButton.TextColor3 = Color3.new(1, 1, 1)
+
+-- Marco minimizado
+MinimizedFrame.Name = "MinimizedFrame"
+MinimizedFrame.Parent = ScreenGui
+MinimizedFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+MinimizedFrame.BorderColor3 = Color3.new(1, 1, 1)
+MinimizedFrame.Size = UDim2.new(0, 220, 0, 40)
+MinimizedFrame.Position = MainFrame.Position
+MinimizedFrame.Visible = false
+MinimizedFrame.Active = true
+MinimizedFrame.Draggable = true
+
+MinimizedTitle.Name = "MinimizedTitle"
+MinimizedTitle.Parent = MinimizedFrame
+MinimizedTitle.BackgroundColor3 = Color3.new(0.2, 0.2, 0.5)
+MinimizedTitle.BorderSizePixel = 0
+MinimizedTitle.Size = UDim2.new(1, 0, 1, 0)
+MinimizedTitle.Font = Enum.Font.GothamBold
+MinimizedTitle.Text = "Give Money"
+MinimizedTitle.TextColor3 = Color3.new(1, 1, 1)
+MinimizedTitle.TextSize = 18
+
+MaximizeButton.Name = "MaximizeButton"
+MaximizeButton.Parent = MinimizedFrame
+MaximizeButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+MaximizeButton.Size = UDim2.new(0, 20, 0, 20)
+MaximizeButton.Position = UDim2.new(1, -30, 0.5, -10)
+MaximizeButton.Text = "+"
+MaximizeButton.TextColor3 = Color3.new(1, 1, 1)
+MaximizeButton.TextSize = 14
+
+-- Funciones
+MinimizeButton.MouseButton1Click:Connect(function()
+    MinimizedFrame.Position = MainFrame.Position
+    MainFrame.Visible = false
+    MinimizedFrame.Visible = true
+end)
+
+MaximizeButton.MouseButton1Click:Connect(function()
+    MainFrame.Position = MinimizedFrame.Position
+    MainFrame.Visible = true
+    MinimizedFrame.Visible = false
+end)
+
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Función para refrescar jugadores
+local function refreshPlayers()
+    for _, child in ipairs(DropdownFrame:GetChildren()) do
+        if child:IsA("TextButton") then
+            child:Destroy()
+        end
+    end
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        local PlayerButton = Instance.new("TextButton")
+        PlayerButton.Parent = DropdownFrame
+        PlayerButton.BackgroundColor3 = Color3.new(0.4, 0.4, 0.4)
+        PlayerButton.Size = UDim2.new(1, 0, 0, 30)
+        PlayerButton.Text = player.Name
+        PlayerButton.TextColor3 = Color3.new(1, 1, 1)
+
+        PlayerButton.MouseButton1Click:Connect(function()
+            PlayerDropdown.Text = player.Name
+            DropdownFrame.Visible = false
+        end)
+    end
+
+    DropdownFrame.CanvasSize = UDim2.new(0, 0, 0, #Players:GetPlayers() * 30)
+end
+
+PlayerDropdown.MouseButton1Click:Connect(function()
+    DropdownFrame.Visible = not DropdownFrame.Visible
+end)
+
+RefreshButton.MouseButton1Click:Connect(refreshPlayers)
+
+SendButton.MouseButton1Click:Connect(function()
+    local chair = ChairInput.Text
+    local money = tonumber(MoneyInput.Text)
+
+    if chair ~= "" and money then
+        local args = {
+            [1] = "Money",
+            [2] = workspace:WaitForChild("Restaurants"):WaitForChild(PlayerDropdown.Text):WaitForChild("Addments"):WaitForChild("Chairs"):WaitForChild(chair),
+            [3] = money
+        }
+
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Clients"):FireServer(unpack(args))
+    else
+        warn("Please fill in all fields correctly.")
+    end
+end)
+
+-- Inicialización
+refreshPlayers()
