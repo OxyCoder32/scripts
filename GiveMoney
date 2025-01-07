@@ -200,7 +200,7 @@ InfMoneyButton.MouseButton1Click:Connect(function()
         local args = {
             [1] = "Money",
             [2] = workspace:WaitForChild("Restaurants"):WaitForChild(PlayerDropdown.Text):WaitForChild("Addments"):WaitForChild("Chairs"):WaitForChild(chair),
-            [3] = math.huge -- Asigna una cantidad infinita de dinero
+            [3] = 999999999999999999999999999999999
         }
 
         ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Clients"):FireServer(unpack(args))
