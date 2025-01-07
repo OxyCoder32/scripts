@@ -10,6 +10,7 @@ local DropdownFrame = Instance.new("ScrollingFrame")
 local RefreshButton = Instance.new("TextButton")
 local ChairInput = Instance.new("TextBox")
 local MoneyInput = Instance.new("TextBox")
+local InfMoneyButton = Instance.new("TextButton")
 local SendButton = Instance.new("TextButton")
 local CloseButton = Instance.new("TextButton")
 local UIListLayout = Instance.new("UIListLayout")
@@ -24,7 +25,7 @@ MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
 MainFrame.BorderColor3 = Color3.new(1, 1, 1)
-MainFrame.Size = UDim2.new(0, 220, 0, 400)
+MainFrame.Size = UDim2.new(0, 220, 0, 445)
 MainFrame.Position = UDim2.new(0.5, -110, 0.5, -200)
 MainFrame.Active = true
 MainFrame.Draggable = true
@@ -93,6 +94,14 @@ MoneyInput.Size = UDim2.new(0, 200, 0, 30)
 MoneyInput.PlaceholderText = "Enter Money Amount"
 MoneyInput.Text = ""
 
+InfMoneyButton.Name = "InfMoneyButton"
+InfMoneyButton.Parent = MainFrame
+InfMoneyButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+InfMoneyButton.Position = UDim2.new(0, 10, 0, 360) -- Posición debajo del resto
+InfMoneyButton.Size = UDim2.new(0, 200, 0, 30)
+InfMoneyButton.Text = "Inf Money"
+InfMoneyButton.TextColor3 = Color3.new(1, 1, 1)
+
 SendButton.Name = "SendButton"
 SendButton.Parent = MainFrame
 SendButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
@@ -104,7 +113,7 @@ SendButton.TextColor3 = Color3.new(1, 1, 1)
 CloseButton.Name = "CloseButton"
 CloseButton.Parent = MainFrame
 CloseButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
-CloseButton.Position = UDim2.new(0, 10, 0, 360)
+CloseButton.Position = UDim2.new(0, 10, 0, 400)
 CloseButton.Size = UDim2.new(0, 200, 0, 30)
 CloseButton.Text = "Close GUI"
 CloseButton.TextColor3 = Color3.new(1, 1, 1)
@@ -183,6 +192,22 @@ PlayerDropdown.MouseButton1Click:Connect(function()
 end)
 
 RefreshButton.MouseButton1Click:Connect(refreshPlayers)
+
+InfMoneyButton.MouseButton1Click:Connect(function()
+    local chair = ChairInput.Text
+
+    if chair ~= "" and PlayerDropdown.Text ~= "Select Player" then
+        local args = {
+            [1] = "Money",
+            [2] = workspace:WaitForChild("Restaurants"):WaitForChild(PlayerDropdown.Text):WaitForChild("Addments"):WaitForChild("Chairs"):WaitForChild(chair),
+            [3] = math.huge -- Asigna una cantidad infinita de dinero
+        }
+
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Clients"):FireServer(unpack(args))
+    else
+        warn("Please select a player and enter a valid Chair ID.")
+    end
+end)
 
 SendButton.MouseButton1Click:Connect(function()
     local chair = ChairInput.Text
