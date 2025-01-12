@@ -1,0 +1,143 @@
+-- Crear la pantalla principal (GUI)
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local AutoMerchButton = Instance.new("TextButton")
+local CloseButton = Instance.new("TextButton")
+
+-- Servicios de Roblox
+local Players = game:GetService("Players")
+
+-- Obtener al jugador local
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Guardar la posición inicial del jugador
+local initialPosition = rootPart.Position
+
+-- Propiedades de la GUI
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+ScreenGui.Name = "CustomGUI"
+
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+MainFrame.Size = UDim2.new(0, 200, 0, 100)
+MainFrame.Position = UDim2.new(0.5, -100, 0.5, -50)
+MainFrame.Active = true
+MainFrame.Draggable = true -- Hacer que el marco sea arrastrable
+
+AutoMerchButton.Parent = MainFrame
+AutoMerchButton.Text = "Auto Merch: OFF"
+AutoMerchButton.Size = UDim2.new(0, 180, 0, 30)
+AutoMerchButton.Position = UDim2.new(0, 10, 0, 20)
+AutoMerchButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+AutoMerchButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+CloseButton.Parent = MainFrame
+CloseButton.Text = "Close"
+CloseButton.Size = UDim2.new(0, 180, 0, 30)
+CloseButton.Position = UDim2.new(0, 10, 0, 60)
+CloseButton.BackgroundColor3 = Color3.fromRGB(220, 20, 60)
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Variables de Auto Merch
+local autoMerchActive = false
+
+local function waitForInstance(parent, name)
+    print("[DEBUG] Esperando a que aparezca:", name)
+    while not parent:FindFirstChild(name) do
+        task.wait(0.1)
+    end
+    print("[DEBUG] Instancia encontrada:", name)
+    return parent:FindFirstChild(name)
+end
+
+-- Función para cambiar la duración del ProximityPrompt
+local function adjustProximityPromptDuration(prompt)
+    if prompt and prompt:IsA("ProximityPrompt") then
+        -- Ajustar el holdDuration a 0 para que la activación sea instantánea
+        prompt.HoldDuration = 0
+    else
+        print("[DEBUG] No se encontró un ProximityPrompt válido.")
+    end
+end
+
+local function autoMerch()
+    print("[DEBUG] Auto Merch activado.")
+
+    -- Desactivar la gravedad y permitir vuelo
+    humanoid.PlatformStand = true
+    humanoid.AutoRotate = false
+
+    -- Habilitar noclip
+    local bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
+    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+    bodyVelocity.Parent = rootPart
+
+    -- Guardar la posición inicial
+    local startPosition = rootPart.Position
+
+    while autoMerchActive do
+        -- Teletransportarse a la primera posición
+        print("[DEBUG] Teletransportándose a la primera posición...")
+        rootPart.CFrame = CFrame.new(-1469.2271728515625, 4, 924.0908203125)
+        wait(1) -- Delay después del primer teletransporte
+
+        -- Verificar si existe la Mochila en la ruta workspace.(LocalPlayer).Mochila
+        local mochila = workspace:FindFirstChild(player.Name) and workspace[player.Name]:FindFirstChild("Mochila")
+        
+        if mochila then
+            print("[DEBUG] Mochila encontrada, teletransportándose a la segunda posición.")
+            -- Teletransportarse a la segunda posición
+            rootPart.CFrame = CFrame.new(-1348.616943359375, 4, -1040.93408203125)
+            wait(1) -- Delay después del segundo teletransporte
+        else
+            print("[DEBUG] Mochila no encontrada, esperando a que aparezca.")
+            -- Esperar a que aparezca "Mochila" en el workspace del jugador local
+            waitForInstance(workspace:FindFirstChild(player.Name), "Mochila")
+
+            -- Después de que aparezca, teletransportarse a la segunda posición
+            print("[DEBUG] 'Mochila' encontrada, teletransportándose a la segunda posición.")
+            rootPart.CFrame = CFrame.new(-1348.616943359375, 4, -1040.93408203125)
+            wait(1) -- Delay después del segundo teletransporte
+        end
+
+        -- En Pos2, esperar a que "Mochila" desaparezca
+        print("[DEBUG] Esperando a que se elimine 'Mochila'...")
+        while workspace:FindFirstChild(player.Name) and workspace[player.Name]:FindFirstChild("Mochila") do
+            task.wait(0.1)
+        end
+        print("[DEBUG] 'Mochila' eliminada, teletransportándose a la primera posición.")
+
+        -- Después de que "Mochila" desaparezca, teletransportarse a la primera posición
+        rootPart.CFrame = CFrame.new(-1469.2271728515625, 4, 924.0908203125)
+        wait(1) -- Delay antes de reiniciar el ciclo
+    end
+
+    -- Habilitar la gravedad y desactivar vuelo cuando se detenga
+    humanoid.PlatformStand = false
+    humanoid.AutoRotate = true
+
+    -- Desactivar noclip
+    bodyVelocity:Destroy()
+
+    -- Volver a la posición inicial cuando se detenga el Auto Merch
+    print("[DEBUG] Regresando a la posición inicial...")
+    rootPart.CFrame = CFrame.new(startPosition)
+    print("[DEBUG] Auto Merch desactivado.")
+end
+
+AutoMerchButton.MouseButton1Click:Connect(function()
+    autoMerchActive = not autoMerchActive
+    AutoMerchButton.Text = "Auto Merch: " .. (autoMerchActive and "ON" or "OFF")
+    if autoMerchActive then
+        -- Ejecutar el ciclo en un hilo separado
+        coroutine.wrap(autoMerch)()
+    end
+end)
+
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
