@@ -1,0 +1,182 @@
+--[[ GUI Using OrionLib ]]
+local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
+local Window = OrionLib:MakeWindow({Name = "Auto Farm for SCP-3008", HidePremium = false, SaveConfig = true, ConfigFolder = "AutoFarmConfig"})
+
+--[[ Credits Tab ]]
+local CreditsTab = Window:MakeTab({
+    Name = "Credits",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+CreditsTab:AddLabel("Original Script by Qcalnik")
+CreditsTab:AddLabel("Edited by ziroponto and frenzystuff2")
+CreditsTab:AddLabel("GUI by OxyCoder")
+CreditsTab:AddLabel("Updated to New Version by OxyCoder")
+
+--[[ Auto Farm Tab ]]
+local AutoFarmTab = Window:MakeTab({
+    Name = "Auto Farm",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+--[[ Settings ]]
+local TimesToTeleport = 50
+local Radius = 100
+local AutoFarmEnabled = false
+local IsEmptyingInventory = false  -- New variable to track if the inventory is being emptied
+
+--[[ Variables ]]
+local PS = game:GetService("Players")
+local WS = game:GetService("Workspace")
+local Player = PS.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Backpack = Player:WaitForChild("Backpack")
+local HumanoidRoot = Character:WaitForChild("HumanoidRootPart")
+local Humanoid = Character:WaitForChild("Humanoid")
+local ItemsFolder = WS:WaitForChild("GameObjects").Physical.Items
+local PlayerGui = Player:WaitForChild("PlayerGui")
+local Storage = PlayerGui:WaitForChild("MainGui").Menus.Inventory
+
+--[[ Remotes ]]
+local Pickup = Character.System.Action
+
+local OldCFrame = HumanoidRoot.CFrame
+local OldPosition = HumanoidRoot.Position
+
+function Check(Object)
+    if Object.Name == "Crowbar" then
+        return false
+    end
+    if Object:FindFirstChildOfClass("Part") or Object:FindFirstChildOfClass("MeshPart") then
+        local Part = Object:FindFirstChildOfClass("Part") or Object:FindFirstChildOfClass("MeshPart")
+        local Distance = (OldPosition - Part.Position).magnitude
+        if Distance < Radius then
+            return false
+        end
+        return true, Part
+    end
+    return false
+end
+
+function InventoryCheck()
+    local StorageAmount = Storage.UpperLine.Storage
+    if StorageAmount.Text == "16/16 items" or StorageAmount.Text == "17/16 items" then
+        HumanoidRoot.CFrame = OldCFrame
+        wait()
+        -- Start emptying the inventory, but restrict movement only while doing so
+        IsEmptyingInventory = true
+        HumanoidRoot.Anchored = true  -- Disable movement while emptying the inventory
+        for _, v in pairs(Backpack:GetChildren()) do
+            local A_1 = "Inventory_DropAll"
+            local A_2 = { ["Tool"] = v.Name }
+            Pickup:InvokeServer(A_1, A_2)
+        end
+        repeat task.wait() until StorageAmount.Text == "0/16 items"
+        HumanoidRoot.Anchored = false  -- Enable movement after emptying the inventory
+        IsEmptyingInventory = false  -- Movement re-enabled
+    end
+    return "Done"
+end
+
+function AutoFarm()
+    local Amount = 0
+    for _, v in pairs(WS:GetDescendants()) do
+        if v.Name == "Apple" or v.Name == "Banana" or v.Name == "Bloxy Soda" or v.Name == "Burger" or v.Name == "Beans" or v.Name == "Cookie" or v.Name == "Chips" or v.Name == "Dr. Bob Soda" or v.Name == "Hotdog" or v.Name == "Ice Cream" or v.Name == "Lemon" or v.Name == "Lemon Slice" or v.Name == "Medkit" or v.Name == "Pizza" or v.Name == "Water" or v.Name == "2 Litre Dr. Bob" or v.Name == "Fish Crackers" or v.Name == "Meatballs" then
+            if v:FindFirstChild(v.Name) or v:FindFirstChild("Root") then
+                local Bool, Part = Check(v)
+                if Bool then
+                    Amount = Amount + 1
+                    if Amount >= TimesToTeleport then
+                        HumanoidRoot.CFrame = OldCFrame
+                        -- Empty the inventory only when we reach OldCFrame
+                        wait(1)
+                        IsEmptyingInventory = true
+                        HumanoidRoot.Anchored = true  -- Disable movement
+                        for _, v in pairs(Backpack:GetChildren()) do
+                            local A_1 = "Inventory_DropAll"
+                            local A_2 = { ["Tool"] = v.Name }
+                            Pickup:InvokeServer(A_1, A_2)
+                        end
+                        repeat task.wait() until Storage.UpperLine.Storage.Text == "0/16 items"
+                        HumanoidRoot.Anchored = false  -- Enable movement
+                        IsEmptyingInventory = false
+                        return
+                    else
+                        repeat task.wait()
+                            repeat task.wait() until InventoryCheck() == "Done"
+                            Bool, Part = Check(v)
+                            if Part ~= nil then
+                                HumanoidRoot.CFrame = Part.CFrame
+                                local A_1 = "Store"
+                                local A_2 = { ["Model"] = v }
+                                Pickup:InvokeServer(A_1, A_2)
+                            end
+                        until Part == nil
+                    end
+                end
+            end
+        end
+    end
+end
+
+--[[ GUI Button ]]
+
+AutoFarmTab:AddButton({
+    Name = "Set OldPos & OldCFrame",
+    Callback = function()
+        -- Set the current position and CFrame as reference
+        OldCFrame = HumanoidRoot.CFrame
+        OldPosition = HumanoidRoot.Position
+        print("OldPos and OldCFrame set.")
+    end
+})
+
+AutoFarmTab:AddButton({
+    Name = "Start Auto Farm",
+    Callback = function()
+        -- Save the current position as OldCFrame and OldPosition
+        OldCFrame = HumanoidRoot.CFrame
+        OldPosition = HumanoidRoot.Position
+        AutoFarmEnabled = true
+        task.spawn(AutoFarm)
+        print("Auto Farm started!")
+    end
+})
+
+AutoFarmTab:AddTextbox({
+    Name = "Radius",
+    Default = tostring(Radius),
+    TextDisappear = false,
+    Callback = function(Value)
+        Radius = tonumber(Value) or Radius
+    end
+})
+
+AutoFarmTab:AddTextbox({
+    Name = "Times to Teleport",
+    Default = tostring(TimesToTeleport),
+    TextDisappear = false,
+    Callback = function(Value)
+        TimesToTeleport = tonumber(Value) or TimesToTeleport
+    end
+})
+
+AutoFarmTab:AddButton({
+    Name = "Close Script",
+    Callback = function()
+        OrionLib:Destroy()
+    end
+})
+
+OrionLib:Init()
+
+--[[ Movement restriction while emptying inventory ]]
+game:GetService("RunService").Heartbeat:Connect(function()
+    if IsEmptyingInventory then
+        HumanoidRoot.Anchored = true  -- Disable movement
+    else
+        HumanoidRoot.Anchored = false  -- Enable movement
+    end
+end)
