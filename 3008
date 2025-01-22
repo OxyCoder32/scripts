@@ -1,31 +1,22 @@
---[[ GUI Using OrionLib ]]
-local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Orion/main/source'))()
-local Window = OrionLib:MakeWindow({Name = "Auto Farm for SCP-3008", HidePremium = false, SaveConfig = true, ConfigFolder = "AutoFarmConfig"})
+--[[ GUI Custom Implementation ]]
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local TopBar = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local CloseButton = Instance.new("TextButton")
+local CreditsTab = Instance.new("Frame")
+local AutoFarmTab = Instance.new("Frame")
+local TabsFrame = Instance.new("Frame")
+local CreditsButton = Instance.new("TextButton")
+local AutoFarmButton = Instance.new("TextButton")
 
---[[ Credits Tab ]]
-local CreditsTab = Window:MakeTab({
-    Name = "Credits",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
-
-CreditsTab:AddLabel("Original Script by Qcalnik")
-CreditsTab:AddLabel("Edited by ziroponto and frenzystuff2")
-CreditsTab:AddLabel("GUI by OxyCoder")
-CreditsTab:AddLabel("Updated to New Version by OxyCoder")
-
---[[ Auto Farm Tab ]]
-local AutoFarmTab = Window:MakeTab({
-    Name = "Auto Farm",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+local UIS = game:GetService("UserInputService")
 
 --[[ Settings ]]
 local TimesToTeleport = 50
 local Radius = 100
 local AutoFarmEnabled = false
-local IsEmptyingInventory = false  -- New variable to track if the inventory is being emptied
+local IsEmptyingInventory = false -- New variable to track if the inventory is being emptied
 
 --[[ Variables ]]
 local PS = game:GetService("Players")
@@ -44,6 +35,193 @@ local Pickup = Character.System.Action
 
 local OldCFrame = HumanoidRoot.CFrame
 local OldPosition = HumanoidRoot.Position
+
+-- GUI Properties
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "AutoFarmGUI"
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.Size = UDim2.new(0, 300, 0, 400)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+MainFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+TopBar.Name = "TopBar"
+TopBar.Parent = MainFrame
+TopBar.Size = UDim2.new(1, 0, 0, 30)
+TopBar.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+
+Title.Name = "Title"
+Title.Parent = TopBar
+Title.Size = UDim2.new(1, -30, 1, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "Auto Farm"
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 18
+Title.TextXAlignment = Enum.TextXAlignment.Center
+
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = TopBar
+CloseButton.Size = UDim2.new(0, 30, 1, 0)
+CloseButton.Position = UDim2.new(1, -30, 0, 0)
+CloseButton.BackgroundColor3 = Color3.new(0.8, 0.2, 0.2)
+CloseButton.Text = "X"
+CloseButton.Font = Enum.Font.SourceSansBold
+CloseButton.TextColor3 = Color3.new(1, 1, 1)
+CloseButton.TextSize = 18
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+TabsFrame.Name = "TabsFrame"
+TabsFrame.Parent = MainFrame
+TabsFrame.Size = UDim2.new(1, 0, 0, 40)
+TabsFrame.Position = UDim2.new(0, 0, 0, 30)
+TabsFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+
+CreditsButton.Name = "CreditsButton"
+CreditsButton.Parent = TabsFrame
+CreditsButton.Size = UDim2.new(0.5, 0, 1, 0)
+CreditsButton.Position = UDim2.new(0, 0, 0, 0)
+CreditsButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+CreditsButton.Text = "Credits"
+CreditsButton.Font = Enum.Font.SourceSansBold
+CreditsButton.TextColor3 = Color3.new(1, 1, 1)
+CreditsButton.TextSize = 14
+
+AutoFarmButton.Name = "AutoFarmButton"
+AutoFarmButton.Parent = TabsFrame
+AutoFarmButton.Size = UDim2.new(0.5, 0, 1, 0)
+AutoFarmButton.Position = UDim2.new(0.5, 0, 0, 0)
+AutoFarmButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+AutoFarmButton.Text = "Auto Farm"
+AutoFarmButton.Font = Enum.Font.SourceSansBold
+AutoFarmButton.TextColor3 = Color3.new(1, 1, 1)
+AutoFarmButton.TextSize = 14
+
+-- Config Inputs for Radius and TimesToTeleport
+local function CreateConfigInput(parent, labelText, defaultValue, yPosition, callback)
+    -- Label
+    local Label = Instance.new("TextLabel")
+    Label.Parent = parent
+    Label.Size = UDim2.new(0.5, -10, 0, 30)
+    Label.Position = UDim2.new(0, 10, 0, yPosition)
+    Label.BackgroundTransparency = 1
+    Label.Text = labelText
+    Label.TextColor3 = Color3.new(1, 1, 1)
+    Label.Font = Enum.Font.SourceSansBold
+    Label.TextSize = 14
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Input Box
+    local InputBox = Instance.new("TextBox")
+    InputBox.Parent = parent
+    InputBox.Size = UDim2.new(0.5, -10, 0, 30)
+    InputBox.Position = UDim2.new(0.5, 0, 0, yPosition)
+    InputBox.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+    InputBox.Text = tostring(defaultValue)
+    InputBox.Font = Enum.Font.SourceSans
+    InputBox.TextColor3 = Color3.new(1, 1, 1)
+    InputBox.TextSize = 14
+
+    -- Update Variable
+    InputBox.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            local value = tonumber(InputBox.Text)
+            if value then
+                callback(value)
+                InputBox.Text = tostring(value) -- Update displayed value
+            else
+                InputBox.Text = tostring(defaultValue) -- Reset to default if invalid
+            end
+        end
+    end)
+end
+
+-- Adding Inputs to AutoFarmTab
+CreateConfigInput(AutoFarmTab, "Radius:", Radius, 100, function(value)
+    Radius = value
+    print("Radius updated to:", Radius)
+end)
+
+CreateConfigInput(AutoFarmTab, "Times to Teleport:", TimesToTeleport, 150, function(value)
+    TimesToTeleport = value
+    print("Times to Teleport updated to:", TimesToTeleport)
+end)
+
+CreditsTab.Name = "CreditsTab"
+CreditsTab.Parent = MainFrame
+CreditsTab.Size = UDim2.new(1, 0, 0.75, -70)
+CreditsTab.Position = UDim2.new(0, 0, 0, 70)
+CreditsTab.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+CreditsTab.Visible = true
+
+
+local CreditLabels = {
+    "Original Script by Qcalnik",
+    "Edited by ziroponto and frenzystuff2",
+    "GUI by OxyCoder",
+    "Updated by OxyCoder"
+}
+
+for i, label in ipairs(CreditLabels) do
+    local TextLabel = Instance.new("TextLabel")
+    TextLabel.Parent = CreditsTab
+    TextLabel.Size = UDim2.new(1, 0, 0, 20)
+    TextLabel.Position = UDim2.new(0, 0, 0, (i - 1) * 25)
+    TextLabel.BackgroundTransparency = 1
+    TextLabel.TextColor3 = Color3.new(1, 1, 1)
+    TextLabel.Font = Enum.Font.SourceSans
+    TextLabel.TextSize = 14
+    TextLabel.Text = label
+end
+
+AutoFarmTab.Name = "AutoFarmTab"
+AutoFarmTab.Parent = MainFrame
+AutoFarmTab.Size = UDim2.new(1, 0, 0.75, -70)
+AutoFarmTab.Position = UDim2.new(0, 0, 0, 70)
+AutoFarmTab.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+AutoFarmTab.Visible = false
+
+local Buttons = {
+    {Name = "Set OldPos", Callback = function()
+        OldCFrame = HumanoidRoot.CFrame
+        OldPosition = HumanoidRoot.Position
+        print("Position Set")
+    end},
+    {Name = "Start AutoFarm", Callback = function()
+        AutoFarmEnabled = true
+        task.spawn(AutoFarm)
+    end}
+}
+
+for i, buttonInfo in ipairs(Buttons) do
+    local Button = Instance.new("TextButton")
+    Button.Parent = AutoFarmTab
+    Button.Size = UDim2.new(1, -20, 0, 30)
+    Button.Position = UDim2.new(0, 10, 0, (i - 1) * 40)
+    Button.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+    Button.Text = buttonInfo.Name
+    Button.Font = Enum.Font.SourceSansBold
+    Button.TextColor3 = Color3.new(1, 1, 1)
+    Button.TextSize = 14
+    Button.MouseButton1Click:Connect(buttonInfo.Callback)
+end
+
+-- Tab switching
+CreditsButton.MouseButton1Click:Connect(function()
+    CreditsTab.Visible = true
+    AutoFarmTab.Visible = false
+end)
+
+AutoFarmButton.MouseButton1Click:Connect(function()
+    CreditsTab.Visible = false
+    AutoFarmTab.Visible = true
+end)
 
 function Check(Object)
     if Object.Name == "Crowbar" then
@@ -120,63 +298,3 @@ function AutoFarm()
         end
     end
 end
-
---[[ GUI Button ]]
-
-AutoFarmTab:AddButton({
-    Name = "Set OldPos & OldCFrame",
-    Callback = function()
-        -- Set the current position and CFrame as reference
-        OldCFrame = HumanoidRoot.CFrame
-        OldPosition = HumanoidRoot.Position
-        print("OldPos and OldCFrame set.")
-    end
-})
-
-AutoFarmTab:AddButton({
-    Name = "Start Auto Farm",
-    Callback = function()
-        -- Save the current position as OldCFrame and OldPosition
-        OldCFrame = HumanoidRoot.CFrame
-        OldPosition = HumanoidRoot.Position
-        AutoFarmEnabled = true
-        task.spawn(AutoFarm)
-        print("Auto Farm started!")
-    end
-})
-
-AutoFarmTab:AddTextbox({
-    Name = "Radius",
-    Default = tostring(Radius),
-    TextDisappear = false,
-    Callback = function(Value)
-        Radius = tonumber(Value) or Radius
-    end
-})
-
-AutoFarmTab:AddTextbox({
-    Name = "Times to Teleport",
-    Default = tostring(TimesToTeleport),
-    TextDisappear = false,
-    Callback = function(Value)
-        TimesToTeleport = tonumber(Value) or TimesToTeleport
-    end
-})
-
-AutoFarmTab:AddButton({
-    Name = "Close Script",
-    Callback = function()
-        OrionLib:Destroy()
-    end
-})
-
-OrionLib:Init()
-
---[[ Movement restriction while emptying inventory ]]
-game:GetService("RunService").Heartbeat:Connect(function()
-    if IsEmptyingInventory then
-        HumanoidRoot.Anchored = true  -- Disable movement
-    else
-        HumanoidRoot.Anchored = false  -- Enable movement
-    end
-end)
