@@ -1,4 +1,3 @@
--- Crear la pantalla principal (GUI)
 local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local TitleLabel = Instance.new("TextLabel")
@@ -8,7 +7,15 @@ local AuthorLabel = Instance.new("TextLabel")
 
 -- Servicios de Roblox
 local Players = game:GetService("Players")
+
+-- Obtener al jugador local
 local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Guardar la posición inicial del jugador
+local initialPosition = rootPart.Position
 
 -- GUI Base
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
@@ -56,7 +63,7 @@ CloseButton.TextSize = 16
 
 -- Autor
 AuthorLabel.Parent = MainFrame
-AuthorLabel.Text = "By OxyCoder"
+AuthorLabel.Text = "By Nez"
 AuthorLabel.Size = UDim2.new(1, 0, 0, 20)
 AuthorLabel.Position = UDim2.new(0, 0, 1, -20)
 AuthorLabel.BackgroundTransparency = 1
