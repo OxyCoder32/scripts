@@ -19,7 +19,7 @@ local initialPosition = rootPart.Position
 
 -- GUI Base
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
-ScreenGui.Name = "CustomGUI"
+ScreenGui.Name = "XGUI"
 
 -- Marco Principal
 MainFrame.Parent = ScreenGui
@@ -32,7 +32,7 @@ MainFrame.Draggable = true
 
 -- Título
 TitleLabel.Parent = MainFrame
-TitleLabel.Text = "Auto Merch GUI"
+TitleLabel.Text = "Auto Farm"
 TitleLabel.Size = UDim2.new(1, 0, 0, 30)
 TitleLabel.Position = UDim2.new(0, 0, 0, 0)
 TitleLabel.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
@@ -63,7 +63,7 @@ CloseButton.TextSize = 16
 
 -- Autor
 AuthorLabel.Parent = MainFrame
-AuthorLabel.Text = "By Nez"
+AuthorLabel.Text = "By OxyCoder"
 AuthorLabel.Size = UDim2.new(1, 0, 0, 20)
 AuthorLabel.Position = UDim2.new(0, 0, 1, -20)
 AuthorLabel.BackgroundTransparency = 1
