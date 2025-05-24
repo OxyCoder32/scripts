@@ -5,23 +5,18 @@ local AutoMerchButton = Instance.new("TextButton")
 local CloseButton = Instance.new("TextButton")
 local AuthorLabel = Instance.new("TextLabel")
 
--- Servicios de Roblox
 local Players = game:GetService("Players")
 
--- Obtener al jugador local
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 local rootPart = character:WaitForChild("HumanoidRootPart")
 
--- Guardar la posición inicial del jugador
 local initialPosition = rootPart.Position
 
--- GUI Base
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 ScreenGui.Name = "XGUI"
 
--- Marco Principal
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 MainFrame.BorderSizePixel = 0
@@ -30,7 +25,6 @@ MainFrame.Position = UDim2.new(0.5, -110, 0.5, -75)
 MainFrame.Active = true
 MainFrame.Draggable = true
 
--- Título
 TitleLabel.Parent = MainFrame
 TitleLabel.Text = "Auto Farm"
 TitleLabel.Size = UDim2.new(1, 0, 0, 30)
@@ -41,7 +35,6 @@ TitleLabel.Font = Enum.Font.SourceSansBold
 TitleLabel.TextSize = 20
 TitleLabel.BorderSizePixel = 0
 
--- Botón Auto Merch
 AutoMerchButton.Parent = MainFrame
 AutoMerchButton.Text = "Auto Merch: OFF"
 AutoMerchButton.Size = UDim2.new(0, 180, 0, 30)
@@ -51,7 +44,6 @@ AutoMerchButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoMerchButton.Font = Enum.Font.SourceSans
 AutoMerchButton.TextSize = 16
 
--- Botón Cerrar
 CloseButton.Parent = MainFrame
 CloseButton.Text = "Close"
 CloseButton.Size = UDim2.new(0, 180, 0, 30)
@@ -61,7 +53,6 @@ CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseButton.Font = Enum.Font.SourceSans
 CloseButton.TextSize = 16
 
--- Autor
 AuthorLabel.Parent = MainFrame
 AuthorLabel.Text = "By OxyCoder"
 AuthorLabel.Size = UDim2.new(1, 0, 0, 20)
@@ -73,51 +64,39 @@ AuthorLabel.TextSize = 14
 AuthorLabel.TextXAlignment = Enum.TextXAlignment.Right
 AuthorLabel.TextYAlignment = Enum.TextYAlignment.Center
 
--- Variables de Auto Merch
 local autoMerchActive = false
 
 local function waitForInstance(parent, name)
-    print("[DEBUG] Esperando a que aparezca:", name)
     while not parent:FindFirstChild(name) do
         task.wait(0.1)
     end
-    print("[DEBUG] Instancia encontrada:", name)
     return parent:FindFirstChild(name)
 end
 
--- Función para cambiar la duración del ProximityPrompt
 local function adjustProximityPromptDuration(prompt)
     if prompt and prompt:IsA("ProximityPrompt") then
-        -- Ajustar el holdDuration a 0 para que la activación sea instantánea
         prompt.HoldDuration = 0
     else
-        print("[DEBUG] No se encontró un ProximityPrompt válido.")
+        print("[DEBUG] Error.")
     end
 end
 
 local function autoMerch()
-    print("[DEBUG] Auto Merch activado.")
 
-    -- Desactivar la gravedad y permitir vuelo
     humanoid.PlatformStand = true
     humanoid.AutoRotate = false
 
-    -- Habilitar noclip
     local bodyVelocity = Instance.new("BodyVelocity")
     bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
     bodyVelocity.Velocity = Vector3.new(0, 0, 0)
     bodyVelocity.Parent = rootPart
 
-    -- Guardar la posición inicial
     local startPosition = rootPart.Position
 
     while autoMerchActive do
-        -- Teletransportarse a la primera posición
-        print("[DEBUG] Teletransportándose a la primera posición...")
         rootPart.CFrame = CFrame.new(-1469.2271728515625, 4, 924.0908203125)
         wait(0.5)
 
-        -- Activar el ProximityPrompt del Dealer (da la mochila)
         local dealerPrompt = workspace:FindFirstChild("NPCS")
             and workspace.NPCS:FindFirstChild("Mercancia")
             and workspace.NPCS.Mercancia:FindFirstChild("Dealer")
@@ -126,22 +105,16 @@ local function autoMerch()
             and workspace.NPCS.Mercancia.Dealer.HumanoidRootPart.Handler:FindFirstChildWhichIsA("ProximityPrompt")
 
         if dealerPrompt then
-            print("[DEBUG] Activando ProximityPrompt del Dealer...")
             fireproximityprompt(dealerPrompt)
         else
-            print("[DEBUG] No se encontró el ProximityPrompt del Dealer")
+            print("[DEBUG] Error2")
         end
 
-        -- Esperar a que aparezca la Mochila
-        print("[DEBUG] Esperando a que aparezca 'Mochila'...")
         waitForInstance(workspace:FindFirstChild(player.Name), "Mochila")
 
-        -- Teletransportarse a la segunda posición
-        print("[DEBUG] Teletransportándose a la segunda posición...")
         rootPart.CFrame = CFrame.new(-1348.616943359375, 3.7, -1040.93408203125)
         wait(0.5)
 
-        -- Activar el ProximityPrompt del Vendedor (vende la mochila)
         local vendedorPrompt = workspace:FindFirstChild("NPCS")
             and workspace.NPCS:FindFirstChild("Mercancia")
             and workspace.NPCS.Mercancia:FindFirstChild("Vendedor")
@@ -150,25 +123,19 @@ local function autoMerch()
             and workspace.NPCS.Mercancia.Vendedor.HumanoidRootPart.Handler:FindFirstChildWhichIsA("ProximityPrompt")
 
         if vendedorPrompt then
-            print("[DEBUG] Activando ProximityPrompt del Vendedor...")
             fireproximityprompt(vendedorPrompt)
         else
-            print("[DEBUG] No se encontró el ProximityPrompt del Vendedor")
+            print("[DEBUG] Error3")
         end
 
-        -- Esperar a que desaparezca la mochila
-        print("[DEBUG] Esperando a que se elimine 'Mochila'...")
         while workspace:FindFirstChild(player.Name) and workspace[player.Name]:FindFirstChild("Mochila") do
             task.wait(0.1)
         end
 
-        print("[DEBUG] 'Mochila' eliminada, repitiendo ciclo...")
         wait(1)
     end
 
-    -- Al desactivarse, si aún tiene la mochila, venderla antes de volver
     if workspace:FindFirstChild(player.Name) and workspace[player.Name]:FindFirstChild("Mochila") then
-        print("[DEBUG] AutoMerch OFF: Vendiendo mochila pendiente...")
 
         rootPart.CFrame = CFrame.new(-1348.616943359375, 3.7, -1040.93408203125)
         wait(0.5)
@@ -181,26 +148,20 @@ local function autoMerch()
             and workspace.NPCS.Mercancia.Vendedor.HumanoidRootPart.Handler:FindFirstChildWhichIsA("ProximityPrompt")
 
         if vendedorPrompt then
-            print("[DEBUG] Activando ProximityPrompt final del Vendedor...")
             fireproximityprompt(vendedorPrompt)
         else
-            print("[DEBUG] No se encontró el ProximityPrompt del Vendedor (final)")
+            print("[DEBUG] Error4")
         end
 
-        -- Esperar a que desaparezca
         while workspace:FindFirstChild(player.Name) and workspace[player.Name]:FindFirstChild("Mochila") do
             task.wait(0.1)
         end
-
-        print("[DEBUG] Mochila final vendida.")
     end
 
-    -- Restaurar estado
     humanoid.PlatformStand = false
     humanoid.AutoRotate = true
     bodyVelocity:Destroy()
     rootPart.CFrame = CFrame.new(startPosition)
-    print("[DEBUG] Auto Merch desactivado. Posición restaurada.")
 end
 
 
@@ -209,7 +170,6 @@ AutoMerchButton.MouseButton1Click:Connect(function()
     autoMerchActive = not autoMerchActive
     AutoMerchButton.Text = "Auto Merch: " .. (autoMerchActive and "ON" or "OFF")
     if autoMerchActive then
-        -- Ejecutar el ciclo en un hilo separado
         coroutine.wrap(autoMerch)()
     end
 end)
