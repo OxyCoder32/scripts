@@ -94,7 +94,7 @@ local function autoMerch()
     local startPosition = rootPart.Position
 
     while autoMerchActive do
-        rootPart.CFrame = CFrame.new(-1469.2271728515625, 4, 924.0908203125)
+        rootPart.CFrame = CFrame.new(-1469.2271728515625, 2, 924.0908203125)
         wait(0.5)
 
         local dealerPrompt = workspace:FindFirstChild("NPCS")
@@ -112,7 +112,7 @@ local function autoMerch()
 
         waitForInstance(workspace:FindFirstChild(player.Name), "Mochila")
 
-        rootPart.CFrame = CFrame.new(-1348.616943359375, 3.7, -1040.93408203125)
+        rootPart.CFrame = CFrame.new(-1348.616943359375, 2, -1040.93408203125)
         wait(0.5)
 
         local vendedorPrompt = workspace:FindFirstChild("NPCS")
@@ -177,4 +177,3 @@ end)
 CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
-
